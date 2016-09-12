@@ -1,6 +1,12 @@
 <?php
 return array(
     'doctrine' => array(
+        'connection' => [
+            'odm_default' => [
+                'server' => 'mongo',
+                'dbname' => 'doctrineMongoODMModuleTest',
+            ],
+        ],
         'configuration' => array(
             'odm_default' => array(
                 'default_db' => 'doctrineMongoODMModuleTest',
