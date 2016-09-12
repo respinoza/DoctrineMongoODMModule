@@ -21,7 +21,7 @@ namespace DoctrineMongoODMModule\Service;
 use Doctrine\ODM\MongoDB\DocumentManager;
 use DoctrineModule\Stdlib\Hydrator\DoctrineObject;
 
-use Zend\Stdlib\Hydrator\HydratorPluginManager;
+use Zend\Hydrator\HydratorPluginManager;
 
 class DoctrineObjectHydratorFactory
 {

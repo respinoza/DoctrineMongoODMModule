@@ -21,6 +21,7 @@ namespace DoctrineMongoODMModule\Service;
 
 use DoctrineModule\Service\AbstractFactory;
 
+use Interop\Container\ContainerInterface;
 use Zend\ServiceManager\ServiceLocatorInterface;
 
 use DoctrineMongoODMModule\Collector\MongoLoggerCollector;
@@ -54,17 +55,33 @@ class MongoLoggerCollectorFactory extends AbstractFactory
      */
     public function createService(ServiceLocatorInterface $serviceLocator)
     {
-        /** @var $options \DoctrineMongoODMModule\Options\MongoLoggerCollector */
-        $options = $this->getOptions($serviceLocator, 'mongo_logger_collector');
+        $this($serviceLocator, __CLASS__);
+    }
 
-        if ($options->getMongoLogger()) {
-            $debugStackLogger = $serviceLocator->get($options->getMongoLogger());
+    /**
+     * {@inheritDoc}
+     */
+    public function getOptionsClass()
+    {
+        return 'DoctrineMongoODMModule\Options\MongoLoggerCollector';
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function __invoke(ContainerInterface $container, $requestedName, array $options = null)
+    {
+        /** @var $mongoLoggerCollectOptions \DoctrineMongoODMModule\Options\MongoLoggerCollector */
+        $mongoLoggerCollectOptions = $this->getOptions($container, 'mongo_logger_collector');
+
+        if ($mongoLoggerCollectOptions->getMongoLogger()) {
+            $debugStackLogger = $container->get($mongoLoggerCollectOptions->getMongoLogger());
         } else {
             $debugStackLogger = new DebugStack();
         }
 
-        /** @var $options \Doctrine\ODM\MongoDB\Configuration */
-        $configuration = $serviceLocator->get($options->getConfiguration());
+        /** @var $mongoLoggerCollectOptions \Doctrine\ODM\MongoDB\Configuration */
+        $configuration = $container->get($mongoLoggerCollectOptions->getConfiguration());
 
         if (null !== $configuration->getLoggerCallable()) {
             $logger = new LoggerChain();
@@ -76,14 +93,6 @@ class MongoLoggerCollectorFactory extends AbstractFactory
             $configuration->setLoggerCallable(array($debugStackLogger, 'log'));
         }
 
-        return new MongoLoggerCollector($debugStackLogger, $options->getName());
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    public function getOptionsClass()
-    {
-        return 'DoctrineMongoODMModule\Options\MongoLoggerCollector';
+        return new MongoLoggerCollector($debugStackLogger, $mongoLoggerCollectOptions->getName());
     }
 }

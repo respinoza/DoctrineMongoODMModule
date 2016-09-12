@@ -1,7 +1,7 @@
 <?php
-
 return array(
     'modules' => array(
+        'Zend\Router',
         'DoctrineModule',
         'DoctrineMongoODMModule',
     ),

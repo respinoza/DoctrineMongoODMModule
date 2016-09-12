@@ -20,6 +20,7 @@ namespace DoctrineMongoODMModule\Service;
 
 use Doctrine\MongoDB\Connection;
 use DoctrineModule\Service\AbstractFactory;
+use Interop\Container\ContainerInterface;
 use Zend\ServiceManager\ServiceLocatorInterface;
 
 /**
@@ -40,24 +41,43 @@ class ConnectionFactory extends AbstractFactory
      */
     public function createService(ServiceLocatorInterface $serviceLocator)
     {
-        /** @var $options \DoctrineMongoODMModule\Options\Connection */
-        $options = $this->getOptions($serviceLocator, 'connection');
+        return $this($serviceLocator, __CLASS__);
+    }
 
-        $connectionString = $options->getConnectionString();
+    /**
+     * Get the class name of the options associated with this factory.
+     *
+     * @return string
+     */
+    public function getOptionsClass()
+    {
+        return 'DoctrineMongoODMModule\Options\Connection';
+    }
+
+    /**
+     * {@inheritdoc}
+     * @return \Doctrine\MongoDB\Connection
+     */
+    public function __invoke(ContainerInterface $container, $requestedName, array $options = null)
+    {
+        /** @var $connectionOptions \DoctrineMongoODMModule\Options\Connection */
+        $connectionOptions = $this->getOptions($container, 'connection');
+
+        $connectionString = $connectionOptions->getConnectionString();
         $dbName = null;
 
         if (empty($connectionString)) {
             $connectionString = 'mongodb://';
 
-            $user     = $options->getUser();
-            $password = $options->getPassword();
-            $dbName   = $options->getDbName();
+            $user     = $connectionOptions->getUser();
+            $password = $connectionOptions->getPassword();
+            $dbName   = $connectionOptions->getDbName();
 
             if ($user && $password) {
                 $connectionString .= $user . ':' . $password . '@';
             }
 
-            $connectionString .= $options->getServer() . ':' . $options->getPort();
+            $connectionString .= $connectionOptions->getServer() . ':' . $connectionOptions->getPort();
 
             if ($dbName) {
                 $connectionString .= '/' . $dbName;
@@ -77,23 +97,13 @@ class ConnectionFactory extends AbstractFactory
         }
 
         /** @var $configuration \Doctrine\ODM\MongoDB\Configuration */
-        $configuration = $serviceLocator->get('doctrine.configuration.' . $this->getName());
+        $configuration = $container->get('doctrine.configuration.' . $this->getName());
 
         // Set defaultDB to $dbName, if it's not defined in configuration
         if (null === $configuration->getDefaultDB()) {
             $configuration->setDefaultDB($dbName);
         }
 
-        return new Connection($connectionString, $options->getOptions(), $configuration);
-    }
-
-    /**
-     * Get the class name of the options associated with this factory.
-     *
-     * @return string
-     */
-    public function getOptionsClass()
-    {
-        return 'DoctrineMongoODMModule\Options\Connection';
+        return new Connection($connectionString, $connectionOptions->getOptions(), $configuration);
     }
 }

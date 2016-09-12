@@ -33,7 +33,7 @@ class ServiceManagerFactory
     /**
      * @var array
      */
-    protected static $config;
+    protected static $config = [];
 
     /**
      * @param array $config
@@ -46,26 +46,25 @@ class ServiceManagerFactory
     /**
      * Builds a new service manager
      *
-     * @return \Zend\ServiceManager\ServiceManager
+     * @return ServiceManager
      */
     public static function getServiceManager()
     {
-        $serviceManager = new ServiceManager(
-            new ServiceManagerConfig(
-                isset(static::$config['service_manager']) ? static::$config['service_manager'] : array()
-            )
+        $serviceManager       = new ServiceManager();
+        $serviceManagerConfig = new ServiceManagerConfig(
+            isset(static::$config['service_manager']) ? static::$config['service_manager'] : []
         );
+        $serviceManagerConfig->configureServiceManager($serviceManager);
+
         $serviceManager->setService('ApplicationConfig', static::$config);
         if (!$serviceManager->has('ServiceListener')) {
-            $serviceManager->setFactory(
-                'ServiceListener',
-                'Zend\Mvc\Service\ServiceListenerFactory'
-            );
+            $serviceManager->setFactory('ServiceListener', 'Zend\Mvc\Service\ServiceListenerFactory');
         }
 
-        /** @var $moduleManager \Zend\ModuleManager\ModuleManager */
+        /* @var $moduleManager \Zend\ModuleManager\ModuleManagerInterface */
         $moduleManager = $serviceManager->get('ModuleManager');
         $moduleManager->loadModules();
+
         return $serviceManager;
     }
 }

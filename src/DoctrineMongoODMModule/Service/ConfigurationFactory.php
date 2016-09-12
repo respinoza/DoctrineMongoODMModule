@@ -21,6 +21,7 @@ namespace DoctrineMongoODMModule\Service;
 use DoctrineModule\Service\AbstractFactory;
 use Doctrine\ODM\MongoDB\Configuration;
 use Doctrine\ODM\MongoDB\Types\Type;
+use Interop\Container\ContainerInterface;
 use Zend\ServiceManager\ServiceLocatorInterface;
 
 /**
@@ -41,14 +42,28 @@ class ConfigurationFactory extends AbstractFactory
      */
     public function createService(ServiceLocatorInterface $serviceLocator)
     {
+        return $this($serviceLocator, $this->getOptionsClass());
+    }
+
+    public function getOptionsClass()
+    {
+        return 'DoctrineMongoODMModule\Options\Configuration';
+    }
+
+    /**
+     * {@inheritdoc}
+     * @return \Doctrine\ODM\MongoDB\Configuration
+     */
+    public function __invoke(ContainerInterface $container, $requestedName, array $options = null)
+    {
         /** @var $options \DoctrineMongoODMModule\Options\Configuration */
-        $options = $this->getOptions($serviceLocator, 'configuration');
+        $options = $this->getOptions($container, 'configuration');
 
         $config = new Configuration;
 
         // logger
         if ($options->getLogger()) {
-            $logger = $serviceLocator->get($options->getLogger());
+            $logger = $container->get($options->getLogger());
             $config->setLoggerCallable(array($logger, 'log'));
         }
 
@@ -66,7 +81,7 @@ class ConfigurationFactory extends AbstractFactory
         $config->setDefaultDB($options->getDefaultDb());
 
         // caching
-        $config->setMetadataCacheImpl($serviceLocator->get($options->getMetadataCache()));
+        $config->setMetadataCacheImpl($container->get($options->getMetadataCache()));
 
         // retries
         $config->setRetryConnect($options->getRetryConnect());
@@ -78,7 +93,7 @@ class ConfigurationFactory extends AbstractFactory
         }
 
         // the driver
-        $config->setMetadataDriverImpl($serviceLocator->get($options->getDriver()));
+        $config->setMetadataDriverImpl($container->get($options->getDriver()));
 
         // metadataFactory, if set
         if ($factoryName = $options->getClassMetadataFactoryName()){
@@ -95,10 +110,5 @@ class ConfigurationFactory extends AbstractFactory
         }
 
         return $config;
-    }
-
-    public function getOptionsClass()
-    {
-        return 'DoctrineMongoODMModule\Options\Configuration';
     }
 }

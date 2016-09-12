@@ -43,7 +43,7 @@ class ConnectionFactoryTest extends AbstractTest
 
     public function testConnectionStringOverwritesOtherConnectionSettings()
     {
-        $connectionString = 'mongodb://localhost:27017';
+        $connectionString = 'mongodb://mongo:27017';
         $connectionConfig = array(
             'odm_default' => array(
                 'server'           => 'unreachable',
@@ -65,7 +65,7 @@ class ConnectionFactoryTest extends AbstractTest
     public function testConnectionStringShouldAllowMultipleHosts()
     {
         $unreachablePort  = 56000;
-        $connectionString = "mongodb://localhost:$unreachablePort,localhost:27017";
+        $connectionString = "mongodb://mongo:$unreachablePort,mongo:27017";
         $connectionConfig = array(
             'odm_default' => array(
                 'connectionString' => $connectionString,
@@ -103,6 +103,7 @@ class ConnectionFactoryTest extends AbstractTest
         $connectionConfig = array(
             'odm_default' => array(
                 'dbname' => $dbName,
+                'server' => 'mongo',
             )
         );
 
@@ -122,6 +123,7 @@ class ConnectionFactoryTest extends AbstractTest
         $connectionConfig = array(
             'odm_default' => array(
                 'dbname' => 'test fails if this is defaultDB',
+                'server' => 'mongo',
             )
         );
 
@@ -138,7 +140,7 @@ class ConnectionFactoryTest extends AbstractTest
     public function testConnectionStringShouldSetDefaultDB()
     {
         $dbName  = 'foo_db';
-        $connectionString = "mongodb://localhost:27017/$dbName";
+        $connectionString = "mongodb://mongo:27017/$dbName";
         $connectionConfig = array(
             'odm_default' => array(
                 'connectionString' => $connectionString,
