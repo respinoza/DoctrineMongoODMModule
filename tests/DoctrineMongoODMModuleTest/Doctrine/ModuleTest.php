@@ -31,7 +31,7 @@ class ModuleTest extends PHPUnit_Framework_TestCase
             ->disableOriginalConstructor()
             ->getMock();
 
-        $serviceManager = $this->getMock('Zend\ServiceManager\ServiceManager');
+        $serviceManager = $this->createMock('Zend\ServiceManager\ServiceManager');
         $serviceManager->expects($this->once())
             ->method('get')
             ->with('doctrine.documentmanager.odm_default')
@@ -54,7 +54,7 @@ class ModuleTest extends PHPUnit_Framework_TestCase
             ->disableOriginalConstructor()
             ->getMock();
 
-        $serviceManager = $this->getMock('Zend\ServiceManager\ServiceManager');
+        $serviceManager = $this->createMock('Zend\ServiceManager\ServiceManager');
         $serviceManager->expects($this->once())
             ->method('get')
             ->with('doctrine.documentmanager.some_other_name')

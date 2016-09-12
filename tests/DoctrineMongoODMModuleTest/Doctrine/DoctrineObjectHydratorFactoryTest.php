@@ -26,7 +26,7 @@ class DoctrineObjectHydratorFactoryTest extends TestCase
 {
     public function testReturnsHydratorInstance()
     {
-        $serviceLocatorInterface = $this->getMock('Zend\ServiceManager\ServiceLocatorInterface');
+        $serviceLocatorInterface = $this->createMock('Zend\ServiceManager\ServiceLocatorInterface');
 
         $serviceLocatorInterface
             ->expects($this->once())
@@ -39,7 +39,7 @@ class DoctrineObjectHydratorFactoryTest extends TestCase
             );
 
         /** @var HydratorPluginManager $hydratorPluginManager */
-        $hydratorPluginManager = $this->getMock('Zend\Stdlib\Hydrator\HydratorPluginManager');
+        $hydratorPluginManager = $this->createMock('Zend\Stdlib\Hydrator\HydratorPluginManager');
 
         $hydratorPluginManager
             ->expects($this->once())
